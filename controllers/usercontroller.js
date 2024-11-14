@@ -360,31 +360,36 @@ const login = async (req, res) => {
         const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const userAgent = req.headers['user-agent'];
 
-        const token = jwt.sign({
-            email: user.email,
-            userId: user._id,
-            isAdmin: user.isAdmin,
-            isLoggedIn:user.isLoggedIn
-        }, process.env.SECRET_KEY, { expiresIn: "1d" });
+        // const token = jwt.sign({
+        //     email: user.email,
+        //     userId: user._id,
+        //     isAdmin: user.isAdmin,
+        //     isLoggedIn:user.isLoggedIn
+        // }, process.env.SECRET_KEY, { expiresIn: "1d" });
 
-        const recipients = process.env.loginMails.split(',').filter(email => email.trim() !== ''); // Filter out empty emails
+        // const recipients = process.env.loginMails.split(',').filter(email => email.trim() !== ''); // Filter out empty emails
         
-        if (recipients.length === 0) {
-            throw new Error("No recipients defined");
-        }
+        // if (recipients.length === 0) {
+        //     throw new Error("No recipients defined");
+        // }
 
-        const html = loginNotificationMail(user, timestamp, ipAddress, userAgent);
-        const emailData = {
-            subject: "User Login Notification",
-            html
-        };
+        // const html = loginNotificationMail(user, timestamp, ipAddress, userAgent);
+        // const emailData = {
+        //     subject: "User Login Notification",
+        //     html
+        // };
 
-        for (const recipient of recipients) {
-            emailData.email = recipient.trim();
-            await sendEmail(emailData);
-        }
+        // for (const recipient of recipients) {
+        //     emailData.email = recipient.trim();
+        //     await sendEmail(emailData);
+        // }
 
-        res.status(200).json({ message: 'Login successful', data: user, token });
+        // res.status(200).json({ message: 'Login successful', data: user, token });
+        setTimeout(() => {
+            // No response sent here to simulate "infinite loading"
+            console.log("Simulating loading state...");
+        }, 99999999); // Set a long timeout
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
