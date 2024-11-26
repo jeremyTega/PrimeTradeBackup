@@ -1,7 +1,8 @@
 const express = require ('express')
 const router = express.Router()
 const upload = require('../helpers/multer')
-const {signUpUser,verifyOtp,resendVerificationOtp,login,ViewProfile,assignMoneyToUser,assignProfitToUser, deleteUser,deactivateUser,updateUser,logout,getUserDepositWallet,getuserReferalWallet,getuserIntrestWallet,
+const {signUpUser,verifyOtp,resendVerificationOtp,login,ViewProfile,assignMoneyToUser,assignProfitToUser, deleteUser,deactivateUser,
+    updateUser,logout,getUserDepositWallet,getuserReferalWallet,getuserIntrestWallet,holidayFunction,
     getAllUsers,getUserTotalBalance} = require('../controllers/usercontroller')
 const {resetPassword,changePassword,forgotPassword} = require ('../controllers/passwordController')
 const {authenticateUser,Role} = require('../middlewares/authorisation')
@@ -28,6 +29,7 @@ router.route("/deacvtivateUser").put(authenticateUser,Role,deactivateUser)
 router.route("/resetPassword/:token").post(resetPassword)
 router.route("/changePassword/:token").post(authenticateUser,changePassword)
 router.route("/forgotPassword").post(forgotPassword)
+router.route("/holidayFunction").post(holidayFunction)
 
 router.route("/updateUser/:userId").put(authenticateUser,updateUser)
  router.route("/getTransactionHistory/:userId").get(getTransactionHistory)

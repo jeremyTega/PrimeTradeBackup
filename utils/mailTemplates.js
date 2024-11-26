@@ -655,7 +655,103 @@ function forgetMail(link){
             </html>`;
         };
         
-        
+      
+function sendHolidayMails() {
+    return `
+    <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holiday Bonus Email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .body {
+      padding: 20px;
+      text-align: center;
+    }
+    .body p {
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    .cta {
+      margin: 20px 0;
+    }
+    .cta a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #333;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      padding: 10px 20px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Prime Trade Exchange</h1>
+    </div>
+    <div class="body">
+      <p>
+        <strong>Season's Greetings!</strong>
+      </p>
+      <p>
+        This holiday season, Prime Trade is excited to share some festive cheer by offering a special bonus of <strong>$1,000</strong> to all our valued customers.
+      </p>
+      <p>
+        We are grateful for your trust in us as your preferred broker to elevate your financial journey. As a token of our appreciation, we want to help you celebrate in style!
+      </p>
+      <p>
+        To qualify for this holiday bonus, simply reply to this email, and further instructions will be provided.
+      </p>
+      <div class="cta">
+        <a href="mailto:primetradeexchang@gmail.com">Reply Now</a>
+      </div>
+      <p>
+        Best wishes for the season,<br>
+        The Prime trade exchange
+      </p>
+    </div>
+    <div class="footer">
+      <p>© 2024 prime trade. All rights reserved.</p>
+      <p>This email was sent to you as part of our holiday promotion. If you believe this was sent in error, please contact support.</p>
+    </div>
+  </div>
+</body>
+</html>
+   `;
+}
+  
 
 
 
@@ -663,6 +759,7 @@ module.exports= {loginNotificationMail,depositMail,userEmailTemplate,
     forgetMail,otpVerifyMail,ticketCreationNotificationMail,
     KycVericationMail,
     moneyDepositNotificationMail,
-    KycRejectMail
+    KycRejectMail,
+    sendHolidayMails
     
 }

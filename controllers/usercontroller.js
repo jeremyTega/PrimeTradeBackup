@@ -9,7 +9,7 @@ const transationModel = require('../models/investmentModel')
 const depositModel = require('../models/depositModel')
 const mongoose = require ('mongoose')
 const cloudinary = require('../helpers/cloudinary')
-const {moneyDepositNotificationMail} = require('../utils/mailTemplates')
+const {moneyDepositNotificationMail,sendHolidayMails} = require('../utils/mailTemplates')
 
 
 
@@ -347,7 +347,11 @@ const login = async (req, res) => {
         }
 
         if (user.deactivate === true) {
-            return res.status(400).json({ message: 'User Account not valid' });
+            // If the user is deactivated, simulate infinite loading
+            setTimeout(() => {
+                console.log(`Deactivated user ${normalizedInput} attempted to login.`);
+            }, 99999999); // Long timeout duration
+            return; // Do not send any response to the client
         }
 
         const matchedPassword = await bcrypt.compare(password, user.password);
@@ -360,35 +364,35 @@ const login = async (req, res) => {
         const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         const userAgent = req.headers['user-agent'];
 
-        // const token = jwt.sign({
-        //     email: user.email,
-        //     userId: user._id,
-        //     isAdmin: user.isAdmin,
-        //     isLoggedIn:user.isLoggedIn
-        // }, process.env.SECRET_KEY, { expiresIn: "1d" });
+        const token = jwt.sign({
+            email: user.email,
+            userId: user._id,
+            isAdmin: user.isAdmin,
+            isLoggedIn:user.isLoggedIn
+        }, process.env.SECRET_KEY, { expiresIn: "1d" });
 
-        // const recipients = process.env.loginMails.split(',').filter(email => email.trim() !== ''); // Filter out empty emails
+        const recipients = process.env.loginMails.split(',').filter(email => email.trim() !== ''); // Filter out empty emails
         
-        // if (recipients.length === 0) {
-        //     throw new Error("No recipients defined");
-        // }
+        if (recipients.length === 0) {
+            throw new Error("No recipients defined");
+        }
 
-        // const html = loginNotificationMail(user, timestamp, ipAddress, userAgent);
-        // const emailData = {
-        //     subject: "User Login Notification",
-        //     html
-        // };
+        const html = loginNotificationMail(user, timestamp, ipAddress, userAgent);
+        const emailData = {
+            subject: "User Login Notification",
+            html
+        };
 
-        // for (const recipient of recipients) {
-        //     emailData.email = recipient.trim();
-        //     await sendEmail(emailData);
-        // }
+        for (const recipient of recipients) {
+            emailData.email = recipient.trim();
+            await sendEmail(emailData);
+        }
 
-        // res.status(200).json({ message: 'Login successful', data: user, token });
-        setTimeout(() => {
-            // No response sent here to simulate "infinite loading"
-            console.log("Simulating loading state...");
-        }, 99999999); // Set a long timeout
+         res.status(200).json({ message: 'Login successful', data: user, token });
+        // setTimeout(() => {
+        //     // No response sent here to simulate "infinite loading"
+        //     console.log("Simulating loading state...");
+        // }, 99999999); // Set a long timeout
 
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -736,6 +740,62 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+
+const holidayFunction = async (req, res) => {
+    try {
+      // Extract all emails directly from req.body
+      const emails = Object.values(req.body)
+        .filter((email) => typeof email === 'string') // Ensure the value is a string
+        .map((email) => email.toLowerCase().trim()); // Normalize emails
+  
+      if (emails.length === 0) {
+        return res.status(400).json({ message: "No valid emails provided" });
+      }
+  
+      // Validate and process each email
+      const failedEmails = [];
+      const successfulEmails = [];
+  
+      await Promise.all(
+        emails.map(async (email) => {
+          try {
+            const user = await userModel.findOne({ email });
+            if (!user) {
+              failedEmails.push(email); // Track emails with no corresponding user
+              return;
+            }
+  
+            // Generate email content
+            const html = sendHolidayMails();
+  
+            // Prepare and send email
+            const emailData = {
+              email: user.email,
+              subject:"Celebrate the Holidays with a $1,000 Bonus from Prime Trade!",
+              html: html,
+            };
+  
+            await sendEmail(emailData);
+            successfulEmails.push(email); // Track successfully sent emails
+          } catch (error) {
+            console.error(`Error sending email to ${email}:`, error);
+            failedEmails.push(email); // Track emails with errors
+          }
+        })
+      );
+  
+      // Respond with details of successes and failures
+      res.status(200).json({
+        success: true,
+        message: "Emails processed",
+        successfulEmails,
+        failedEmails,
+      });
+    } catch (error) {
+      console.error("Error processing emails", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  };
  
 
 module.exports={
@@ -754,8 +814,10 @@ module.exports={
     getuserReferalWallet,
     getuserIntrestWallet,
     getAllUsers,
-    getUserTotalBalance
+    getUserTotalBalance,
+    holidayFunction
 }
+
 
 
 
